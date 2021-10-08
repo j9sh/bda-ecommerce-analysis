@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.flexmonster.com/theme/stripedteal/flexmonster.min.css" />
+<script src="https://cdn.flexmonster.com/flexmonster.js"></script> 
+
+<div id="pivot"></div>
+
+<div id="pivot_chart"></div>
+
+<script>
+// instantiate two Flexmonster objects using init API calls
+var pivot = new Flexmonster({
+    container: "#pivot",
+    componentFolder: "https://cdn.flexmonster.com/",
+    height: 600,
+    toolbar: true,
+    report: {
+        "dataSource": {
+            "type": "api",
+            "url": "http://localhost:9204/mongo", // the url where our connector is running
+            "index": "marketing" // the collection’s name
+        },
+        // set of hierarchies that will be shown on the grid or on the chart
+        "slice": {
+            "rows": [
+                {
+                    "uniqueName": "Country"
+                }
+            ],
+            "columns": [
+                {
+                    "uniqueName": "[Measures]"
+                }
+            ],
+            "measures": [
+                {
+                    "uniqueName": "Leads",
+                    "aggregation": "sum"
+                },
+                {
+                    "uniqueName": "Opportunities",
+                    "aggregation": "sum"
+                }
+            ]
+        }
+    }
+});
+
+var pivot_charts = new Flexmonster({
+    container: "#pivot_chart",
+    componentFolder: "https://cdn.flexmonster.com/",
+    height: 600,
+    // toolbar: true,
+    report: {
+        "dataSource": {
+            "type": "api",
+            "url": "http://localhost:9204/mongo", // the url where our connector is running
+            "index": "marketing" // the collection’s name
+        },
+        "slice": {
+            "reportFilters": [
+                {
+                    "uniqueName": "Country"
+                },
+                {
+                    "uniqueName":"Source"
+                }
+            ],
+            "rows": [
+                {
+                    "uniqueName": "Traffic"
+                }
+            ],
+            "columns": [
+                {
+                    "uniqueName": "[measures]"
+                }
+            ],
+            "measures": [{
+                    "uniqueName": "Sales",
+                    "aggregation": "sum",
+                    "format": "-10kus1m85vus00"
+                },
+                {
+                    "uniqueName": "Clicks",
+                    "aggregation": "sum"
+                }
+            ]
+        },
+        "options": {
+            "viewType": "charts",
+            "grid": {
+                "showTotals": "rows",
+                "showGrandTotals": "columns"
+            },
+            "chart": {
+                "type": "pie"
+            }
+        },
+        "conditions": [{
+                "formula": "#value < 100",
+                "measure": "Sales",
+                "format": {
+                    "backgroundColor": "#008bff",
+                    "color": "#FFFFFF",
+                    "fontFamily": "Arial",
+                    "fontSize": "12px"
+                }
+            },
+            {
+                "formula": "#value > 500",
+                "measure": "Sales",
+                "format": {
+                    "backgroundColor": "#1cf31c",
+                    "color": "#FFFFFF",
+                    "fontFamily": "Arial",
+                    "fontSize": "12px"
+                }
+            }
+        ],
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.flexmonster.com/theme/stripedteal/flexmonster.min.css" />
+<script src="https://cdn.flexmonster.com/flexmonster.js"></script> 
+
+<div id="pivot"></div>
+
+<div id="pivot_chart"></div>
+
+<script>
+// instantiate two Flexmonster objects using init API calls
+var pivot = new Flexmonster({
+    container: "#pivot",
+    componentFolder: "https://cdn.flexmonster.com/",
+    height: 600,
+    toolbar: true,
+    report: {
+        "dataSource": {
+            "type": "api",
+            "url": "http://localhost:9204/mongo",
+            "index": "transactions"
+        },
+        "slice": {
+            "rows": [
+                {
+                    "uniqueName": "Country"
+                }
+            ],
+            "columns": [
+                {
+                    "uniqueName": "[Measures]"
+                }
+            ],
+            "measures": [
+                {
+                    "uniqueName": "Quantity",
+                    "aggregation": "sum"
+                }
+            ]
+        }
+    }
+})
+
+var pivot_chart = new Flexmonster({
+    container: "#pivot_chart",
+    componentFolder: "https://cdn.flexmonster.com/",
+    height: 600,
+    // toolbar: true,
+    report: {
+        "dataSource": {
+            "type": "api",
+            "url": "http://localhost:9204/mongo",
+            "index": "transactions",
+            "mapping": {
+                "InvoiceDate": {
+                    "type": "date"
+                }
+            }
+        },
+        "slice": {
+            "reportFilters": [
+                {
+                    "uniqueName": "InvoiceDate"
+                },
+                {
+                    "uniqueName": "StockCode"
+                }
+            ],
+            "rows": [
+                {
+                    "uniqueName": "Country"
+                }
+            ],
+            "columns": [
+                {
+                    "uniqueName": "[Measures]"
+                }
+            ],
+            "measures": [{
+                    "uniqueName": "Quantity",
+                    "aggregation": "sum"
+                },
+                {
+                    "uniqueName": "UnitPrice",
+                    "aggregation": "sum"
+                }
+            ],
+        },
+        "options": {
+            "viewType": "charts",
+            "chart": {
+                "type": "bar_h",
+                "activeMeasure": {
+                    "uniqueName": "Quantity",
+                    "aggregation": "sum"
+                }
+            }
+        },
+    }
+})
+</script>
+
+{% endblock %}
